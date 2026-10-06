@@ -196,7 +196,8 @@ if __name__=="__main__":
     # Let Python handle Ctrl+C so ROS remains usable for the final stop command.
     rclpy.init(signal_handler_options=SignalHandlerOptions.NO)
 
-    args = argParser.parse_args()
+    # Allow ROS arguments such as --ros-args -p use_sim_time:=true.
+    args = argParser.parse_args(rclpy.utilities.remove_ros_args()[1:])
 
     if args.motion.lower() == "circle":
         ME=motion_executioner(motion_type=CIRCLE)
