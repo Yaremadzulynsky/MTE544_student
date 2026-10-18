@@ -13,7 +13,7 @@ def main():
     output.parent.mkdir(exist_ok=True)
     # Include historical logs as well as the October 9 in-lab measurements.
     files = [p for p in root.iterdir()
-             if p.is_file() and p.suffix in {'.py', '.sh', '.csv', '.md'}]
+             if p.is_file() and p.suffix in {'.py', '.sh', '.md'}]
     for folder in ('oct-9-in-lab-logs', 'sim-slam-map', 'runs', 'foxglove'):
         files.extend(p for p in (root / folder).rglob('*')
                      if p.is_file() and '__pycache__' not in p.parts)
