@@ -1,7 +1,4 @@
 # Imports
-from math import sqrt
-from re import S
-
 import rclpy
 
 from rclpy.node import Node
@@ -36,7 +33,7 @@ class motion_executioner(Node):
         
         self.type=motion_type
         
-        self.radius_=0.5  # Initial spiral radius in metres
+        self.radius_=0.3  # Initial spiral radius in metres
         self.motion_start_time=None
         
         self.successful_init=False
@@ -160,26 +157,26 @@ class motion_executioner(Node):
     def make_circular_twist(self):
         msg = Twist()
         # fill up the twist msg for circular motion
-        radius = 0.5         # metres
-        msg.linear.x = 0.1   # metres per second
-        msg.angular.z = msg.linear.x / radius  # 0.2 radians per second
+        radius = 0.5  # metres
+        msg.linear.x = 0.2   # metres per second
+        msg.angular.z = msg.linear.x / radius  # 0.4 radians per second
         return msg
     def make_spiral_twist(self):
         msg=Twist()
         # fill up the twist msg for spiral motion
         elapsed=self.motion_elapsed_seconds()
-        # Grow the turning radius by 0.01 m/s from a 0.5 m starting radius.
-        self.radius_=0.5 + 0.01 * elapsed
-        msg.linear.x = 0.1   # Forward speed in metres per second
-        msg.angular.z = msg.linear.x / self.radius_  # Starts at 0.2 rad/s
+        # Grow the turning radius by 0.01 m/s from a 0.3 m starting radius.
+        self.radius_=0.3 + 0.01 * elapsed
+        msg.linear.x = 0.2  # Forward speed in metres per second
+        msg.angular.z = msg.linear.x / self.radius_  # Starts at approximately 0.667 rad/s
         return msg
     
     def make_acc_line_twist(self):
         msg=Twist()
         # fill up the twist msg for line motion
         elapsed=self.motion_elapsed_seconds()
-        # Accelerate at 0.02 m/s^2, reaching the 0.2 m/s speed limit after 10 s.
-        msg.linear.x = min(0.02 * elapsed, 0.2)
+        # Accelerate at 0.04 m/s^2, reaching the 0.2 m/s speed limit after 5 s.
+        msg.linear.x = min(0.04 * elapsed, 0.2)
         msg.angular.z = 0.0  # No turning
         return msg
 
@@ -189,7 +186,7 @@ if __name__=="__main__":
     argParser=argparse.ArgumentParser(description="input the motion type")
 
 
-    argParser.add_argument("--motion", type=str, default="circle")
+    argParser.add_argument("--motion", type=str.lower, choices=motion_types, default="circle")
 
 
 
@@ -207,7 +204,7 @@ if __name__=="__main__":
         ME=motion_executioner(motion_type=SPIRAL)
 
     else:
-        print(f"we don't have {arg.motion.lower()} motion type")
+        raise ValueError(f"Unknown motion type: {args.motion}")
 
 
     

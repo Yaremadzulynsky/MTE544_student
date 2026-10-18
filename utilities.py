@@ -1,4 +1,5 @@
-from math import atan2, asin, sqrt
+"""CSV logging, sensor-log reading, and quaternion yaw conversion for Lab 1."""
+from math import atan2
 import csv
 import json
 
@@ -61,7 +62,7 @@ class FileReader:
 # TODONE Part 5: Implement the conversion from Quaternion to Euler Angles
 def euler_from_quaternion(quat):
     """
-    Convert quaternion (w in last place) to euler roll, pitch, yaw.
+    Return yaw in radians from a quaternion (w in last place).
     quat = [x, y, z, w]
     """
     x, y, z, w=quat # just unpack yaw
