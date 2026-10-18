@@ -2,3 +2,4 @@
 # Motion logs are archived in dedicated run folders.
 /*_content_*.csv
 __pycache__/
+/build_submission.py
