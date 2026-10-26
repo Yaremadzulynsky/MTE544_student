@@ -1,14 +1,13 @@
 # Type of planner
 POINT_PLANNER=0; TRAJECTORY_PLANNER=1
 
-
+import numpy as np
 
 class planner:
-    def __init__(self, type_):
-
+    def __init__(self, type_, trajectory="parabola"):
         self.type=type_
+        self.trajectory=trajectory
 
-    
     def plan(self, goalPoint=[-1.0, -1.0]):
         
         if self.type==POINT_PLANNER:
@@ -23,9 +22,14 @@ class planner:
         y = goalPoint[1]
         return x, y
 
-    # TODO Part 6: Implement the trajectories here
+    # TODONE Part 6: Implement the trajectories here
     def trajectory_planner(self):
-        pass
-        # the return should be a list of trajectory points: [ [x1,y1], ..., [xn,yn]]
-        # return 
+        if self.trajectory=="parabola":
+            x_values = np.linspace(0.0, 1.5, 51)
+            return[[float(x), float(x**2)] for x in x_values]
+        elif self.trajectory=="sigmoid":
+            x_values = np.linspace(0.0, 2.5, 51)
+            return[[float(x), float(2 / (1 + np.exp(-2 * x)) - 1)] for x in x_values]
+        else:
+            raise ValueError("Unknown trajectory type: {}".format(self.trajectory))
 
