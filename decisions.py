@@ -82,13 +82,13 @@ class decision_maker(Node):
             self.controller.PID_angular.logger.save_log()
             self.controller.PID_linear.logger.save_log()
             
-            raise SystemExit
+            raise SystemExit # raise SystemExit to stop the node when the goal is reached
         
         velocity, yaw_rate = self.controller.vel_request(self.localizer.getPose(), self.goal, True)
 
         vel_msg.linear.x = float(velocity)
         vel_msg.angular.z = float(yaw_rate)
-        self.publisher.publish(vel_msg)
+        self.publisher.publish(vel_msg) # publishes velocity commands
 
 import argparse
 
@@ -106,7 +106,7 @@ def main(args=None):
     if args.motion.lower() == "point":
         DM=decision_maker(Twist, "/cmd_vel", odom_qos, [-1.0, -1.0], motion_type=POINT_PLANNER)
     elif args.motion.lower() == "trajectory":
-        DM=decision_maker(Twist, "/cmd_vel", odom_qos, [-1.0, -1.0], motion_type=TRAJECTORY_PLANNER, trajectory=args.trajectory)
+        DM=decision_maker(Twist, "/cmd_vel", odom_qos, [-1.0, -1.0], motion_type=TRAJECTORY_PLANNER, trajectory=args.trajectory) # selects motion profile
     else:
         print("invalid motion type", file=sys.stderr)        
     
@@ -123,7 +123,7 @@ if __name__=="__main__":
     argParser=argparse.ArgumentParser(description="point or trajectory") 
     argParser.add_argument("--motion", type=str, default="point")
     argParser.add_argument("--trajectory", type=str, choices=["parabola", "sigmoid"], default="parabola",
-                           help="trajectory shape used with --motion trajectory (default: parabola)")
+                           help="trajectory shape used with --motion trajectory (default: parabola)") # selects the trajectory shape used with --motion trajectory
     args = argParser.parse_args()
 
     main(args)
