@@ -2,16 +2,18 @@
 
 
 import sys
+import time
 
 from utilities import euler_from_quaternion, calculate_angular_error, calculate_linear_error
 from pid import PID_ctrl
 
-from rclpy import init, spin, spin_once
+from rclpy import init, spin, shutdown
+from rclpy.executors import SingleThreadedExecutor
 from rclpy.node import Node
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, PoseStamped
 
 from rclpy.qos import QoSProfile, ReliabilityPolicy, DurabilityPolicy, HistoryPolicy
-from nav_msgs.msg import Odometry as odom
+from nav_msgs.msg import Odometry as odom, Path
 
 from localization import localization, rawSensor
 
@@ -41,7 +43,7 @@ class decision_maker(Node):
     
     
         elif motion_type==TRAJECTORY_PLANNER:
-            self.controller=trajectoryController(klp=0.2, klv=0.5, kap=0.8, kav=0.6)
+            self.controller=trajectoryController(klp=0.2, klv=0.2, kli=0.2, kap=0.2, kav=0.0, kai=0.0)
             self.planner=planner(TRAJECTORY_PLANNER, trajectory=trajectory)
 
         else:
@@ -55,17 +57,56 @@ class decision_maker(Node):
         # NOTE: goalPoint is used only for the pointPlanner
         self.goal=self.planner.plan(goalPoint)
 
+        # Publish the exact planned waypoints for live visualization/recording.
+        if motion_type == TRAJECTORY_PLANNER:
+            path_qos = QoSProfile(
+                reliability=ReliabilityPolicy.RELIABLE,
+                durability=DurabilityPolicy.TRANSIENT_LOCAL,
+                history=HistoryPolicy.KEEP_LAST,
+                depth=1,
+            )
+            self.path_publisher = self.create_publisher(Path, "/planned_path", path_qos)
+            self.planned_path = Path()
+            self.planned_path.header.frame_id = "odom"
+            for x, y in self.goal:
+                waypoint = PoseStamped()
+                waypoint.header.frame_id = "odom"
+                waypoint.pose.position.x = float(x)
+                waypoint.pose.position.y = float(y)
+                waypoint.pose.orientation.w = 1.0
+                self.planned_path.poses.append(waypoint)
+            self.publish_planned_path()
+            self.create_timer(1.0, self.publish_planned_path)
+
+        self.last_control_stamp = None
+        for name, pid in (("linear", self.controller.PID_linear), ("angular", self.controller.PID_angular)):
+            self.get_logger().info(f"{name} gains: Kp={pid.kp}, Kd={pid.kv}, Ki={pid.ki}")
         self.create_timer(publishing_period, self.timerCallback)
 
 
+    def publish_planned_path(self):
+        stamp = self.get_clock().now().to_msg()
+        self.planned_path.header.stamp = stamp
+        for waypoint in self.planned_path.poses:
+            waypoint.header.stamp = stamp
+        self.path_publisher.publish(self.planned_path)
+
     def timerCallback(self):
         
-        spin_once(self.localizer, timeout_sec=0.0)
+        if (self.localizer.last_received is None or
+                time.monotonic() - self.localizer.last_received > 0.5):
+            self.publisher.publish(Twist())
+            return
 
         if self.localizer.getPose()  is  None:
             print("waiting for odom msgs ....")
             return
 
+        stamp = self.localizer.getPose()[3]
+        stamp_key = (stamp.sec, stamp.nanosec)
+        if stamp_key == self.last_control_stamp:
+            return
+        self.last_control_stamp = stamp_key
         vel_msg=Twist()
         
         # # TODO Part 3: Check if you reached the goal
@@ -127,10 +168,22 @@ def main(args=None):
     
     
     
+    executor = SingleThreadedExecutor()
+    executor.add_node(DM)
+    executor.add_node(DM.localizer)
     try:
-        spin(DM)
-    except SystemExit:
-        print(f"reached there successfully {DM.localizer.pose}")
+        executor.spin()
+    except (SystemExit, KeyboardInterrupt):
+        pass
+    finally:
+        DM.publisher.publish(Twist())
+        DM.controller.PID_linear.logger.save_log()
+        DM.controller.PID_angular.logger.save_log()
+        DM.localizer.loc_logger.save_log()
+        executor.shutdown()
+        DM.localizer.destroy_node()
+        DM.destroy_node()
+        shutdown()
 
 
 if __name__=="__main__":

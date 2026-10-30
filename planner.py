@@ -27,7 +27,7 @@ class planner:
 
     def trajectory_planner(self):
         if self.trajectory == "parabola":
-            x_values = np.linspace(0.0, 1.5, 51)
+            x_values = np.linspace(0.0, 1, 51)
             return [[float(x), float(x**2)] for x in x_values]
         elif self.trajectory == "sigmoid":
             x_values = np.linspace(0.0, 2.5, 51)

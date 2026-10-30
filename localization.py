@@ -1,4 +1,5 @@
 import sys
+import time
 
 from utilities import Logger, euler_from_quaternion
 from rclpy.time import Time
@@ -9,7 +10,7 @@ from nav_msgs.msg import Odometry as odom
 
 from rclpy import init, spin
 
-USE_SIM = True
+USE_SIM = False
 
 rawSensor = 0
 class localization(Node):
@@ -27,14 +28,20 @@ class localization(Node):
                 reliability=ReliabilityPolicy.RELIABLE,
                 durability=DurabilityPolicy.VOLATILE,
                 history=HistoryPolicy.KEEP_LAST,
-                depth=10,
+                depth=1,
             )
         else:
-            # TODO: Check the physical robot's /odom QoS before configuring it.
-            raise NotImplementedError("Configure odometry QoS for the physical robot")
+            # Robot 11 advertises BEST_EFFORT / VOLATILE odometry.
+            odom_qos = QoSProfile(
+                reliability=ReliabilityPolicy.BEST_EFFORT,
+                durability=DurabilityPolicy.VOLATILE,
+                history=HistoryPolicy.KEEP_LAST,
+                depth=1,
+            )
         
         self.loc_logger=Logger("robot_pose.csv", ["x", "y", "theta", "stamp"])
         self.pose=None
+        self.last_received = None
         
         if localizationType == rawSensor:
         # TODONE Part 3: subscribe to the position sensor topic (Odometry)
@@ -53,6 +60,8 @@ class localization(Node):
                                            pose_msg.pose.pose.orientation.w]),
                     pose_msg.header.stamp ]
         
+        self.last_received = time.monotonic()
+
         # Log the data
         self.loc_logger.log_values([self.pose[0], self.pose[1], self.pose[2], Time.from_msg(self.pose[3]).nanoseconds])
     
