@@ -52,6 +52,7 @@ class PID_ctrl:
         # Compute the error derivative
         dt_avg=0
         error_dot=0
+        valid_intervals=0
         
         for i in range(1, len(self.history)):
             
@@ -59,8 +60,13 @@ class PID_ctrl:
             t1=Time.from_msg(self.history[i][1])
             
             dt=(t1.nanoseconds - t0.nanoseconds) / 1e9
+
+            # Repeated or out-of-order timestamps cannot define a derivative.
+            if dt <= 0:
+                continue
             
             dt_avg+=dt
+            valid_intervals+=1
 
             # use constant dt if the messages arrived inconsistent
             # for example dt=0.1 overwriting the calculation          
@@ -68,8 +74,9 @@ class PID_ctrl:
             # TODONE Part 5: calculate the error dot 
             error_dot+= (self.history[i][0] - self.history[i-1][0]) / dt
             
-        error_dot/=len(self.history)
-        dt_avg/=len(self.history)
+        if valid_intervals > 0:
+            error_dot/=valid_intervals
+            dt_avg/=valid_intervals
         
         # Compute the error integral
         sum_=0
