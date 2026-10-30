@@ -68,11 +68,21 @@ class decision_maker(Node):
 
         vel_msg=Twist()
         
-        # TODO Part 3: Check if you reached the goal
-        if type(self.goal) == list:
-            reached_goal=True
-        else: 
-            reached_goal=False
+        # # TODO Part 3: Check if you reached the goal
+        # if type(self.goal) == list:
+        #     reached_goal=True
+        # else: 
+        #     reached_goal=False
+        pose = self.localizer.getPose()
+
+# Trajectories end at the last point; point goals are already (x, y).
+        if self.planner.type == TRAJECTORY_PLANNER:
+            final_goal = self.goal[-1]
+        else:
+            final_goal = self.goal
+
+        distance_to_goal = calculate_linear_error(pose, final_goal)
+        reached_goal = distance_to_goal <= 0.05
         
 
         if reached_goal:
