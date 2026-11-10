@@ -116,11 +116,5 @@ def calculate_angular_error(current_pose, goal_pose):
     error_angular= atan2(goal_pose[1]-current_pose[1],
                         goal_pose[0]-current_pose[0]) - current_pose[2]
     
-    if error_angular <= -M_PI:
-        error_angular += 2*M_PI
-    
-    
-    elif error_angular >= M_PI:
-        error_angular -= 2*M_PI
-    
-    return error_angular
+    # Handles arbitrarily many revolutions of the EKF's unwrapped heading.
+    return atan2(np.sin(error_angular), np.cos(error_angular))

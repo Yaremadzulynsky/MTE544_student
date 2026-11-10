@@ -3,8 +3,9 @@ import sys
 from utilities import euler_from_quaternion, calculate_angular_error, calculate_linear_error
 from pid import PID_ctrl
 
-from rclpy import init, spin, spin_once
+from rclpy import init, spin, spin_once, ok, shutdown
 from rclpy.node import Node
+from rclpy.executors import SingleThreadedExecutor
 from geometry_msgs.msg import Twist
 
 
@@ -32,11 +33,13 @@ class decision_maker(Node):
         self.reachThreshold=0.01
 
 
-        # TODO Part 3: use the Kalman Filter
-        self.localizer=localization(...)
+        # TODONE Part 3: use the Kalman Filter
+        self.localizer = localization(kalmanFilter, publishing_period)
         
         if motion_type==POINT_PLANNER:
-            self.controller=controller(klp=0.2, klv=0.5, kap=0.8, kav=0.6)      
+            # Point-controller gains restored from Lab 2 (origin/L2/Grant).
+            self.controller=controller(klp=0.2, klv=0.5, kli=0.2,
+                                       kap=0.8, kav=0.6, kai=0.2)
             self.planner=planner(POINT_PLANNER)
 
         
@@ -62,7 +65,7 @@ class decision_maker(Node):
 
     def timerCallback(self):
         
-        spin_once(self.localizer)
+        # The shared executor services sensor callbacks independently of this timer.
 
         if self.localizer.getPose() is  None:
             print("waiting for odom msgs ....")
@@ -123,10 +126,22 @@ def main(args=None):
 
 
 
+    executor = SingleThreadedExecutor()
+    executor.add_node(DM)
+    executor.add_node(DM.localizer)
     try:
-        spin(DM)
+        executor.spin()
     except SystemExit:
         print(f"reached there successfully {DM.localizer.pose}")
+    except KeyboardInterrupt:
+        pass
+    finally:
+        DM.publisher.publish(Twist())
+        executor.shutdown()
+        DM.localizer.destroy_node()
+        DM.destroy_node()
+        if ok():
+            shutdown()
 
 
 
