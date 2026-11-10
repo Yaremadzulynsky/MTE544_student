@@ -5,21 +5,21 @@ M_PI=3.1415926535
 import numpy as np
 
 class Logger:
-    
+
     def __init__(self, filename, headers=["e", "e_dot", "e_int", "stamp"]):
-        
+
         self.filename = filename
 
         with open(self.filename, 'w') as file:
-            
+
             header_str=""
 
             for header in headers:
                 header_str+=header
                 header_str+=", "
-            
+
             header_str+="\n"
-            
+
             file.write(header_str)
 
 
@@ -29,23 +29,23 @@ class Logger:
             vals_str=""
             for value in values_list:
                 vals_str+=f"{value}, "
-            
+
             vals_str+="\n"
-            
+
             file.write(vals_str)
-            
+
 
     def save_log(self):
         pass
 
 class FileReader:
     def __init__(self, filename):
-        
+
         self.filename = filename
-        
-        
+
+
     def read_file(self):
-        
+
         read_headers=False
 
         table=[]
@@ -63,25 +63,25 @@ class FileReader:
 
                     read_headers=True
                     break
-            
+
             next(file)
-            
+
             # Read each line and extract values
             for line in file:
                 values = line.strip().split(',')
-                
-                row=[]                
-                
+
+                row=[]
+
                 for val in values:
                     if val=='':
                         break
                     row.append(float(val.strip()))
 
                 table.append(row)
-        
+
         return headers, table
-    
-    
+
+
 # Conversion from Quaternion to Euler Angles
 def euler_from_quaternion(quat):
     """
@@ -106,7 +106,7 @@ def euler_from_quaternion(quat):
 
 # Calculation of the linear error
 def calculate_linear_error(current_pose, goal_pose):
-        
+
     return sqrt( (current_pose[0] - goal_pose[0])**2 +
                 (current_pose[1] - goal_pose[1])**2 )
 
@@ -115,6 +115,6 @@ def calculate_angular_error(current_pose, goal_pose):
 
     error_angular= atan2(goal_pose[1]-current_pose[1],
                         goal_pose[0]-current_pose[0]) - current_pose[2]
-    
+
     # Handles arbitrarily many revolutions of the EKF's unwrapped heading.
     return atan2(np.sin(error_angular), np.cos(error_angular))

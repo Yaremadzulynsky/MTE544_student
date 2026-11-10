@@ -10,12 +10,12 @@ class planner:
 
         self.type=type_
 
-    
+
     def plan(self):
-        
+
         if self.type==POINT_PLANNER:
             return self.point_planner()
-        
+
         elif self.type==TRAJECTORY_PLANNER:
             return self.trajectory_planner()
 
@@ -29,7 +29,7 @@ class planner:
         TRAJECTORY_TYPE=SIGMOID
         degree_rad_conversion=3.14/180.0
         if TRAJECTORY_TYPE == PARABOLA:
-            
+
             path = [[ (x/10.0) ,(x/10.0)**2] for x in range(0,20)]
             # rotate the path by theta degrees
             theta = 60.0 * degree_rad_conversion

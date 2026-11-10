@@ -13,7 +13,7 @@ class PID_ctrl:
     # def __init__(self, type_, kp=2.2,kv=1.6,ki=0.2, history_length=3, filename_="errors.csv"): PID3
     # def __init__(self, type_, kp=3.2,kv=2.6,ki=0.2, history_length=3, filename_="errors.csv"): PID4
     def __init__(self, type_, kp=1.2,kv=0.8,ki=0.2, history_length=3, filename_="errors.csv"):
-        
+
         # Data for the controller
         self.history_length=history_length
         self.history=[]
@@ -25,26 +25,26 @@ class PID_ctrl:
         self.kp=kp    # proportional gain
         self.kv=kv    # derivative gain
         self.ki=ki    # integral gain
-        
+
         self.logger=Logger(filename_)
         # Remeber that you are writing to the file named filename_ or errors.csv the following:
             # error, error_dot, error_int and time stamp
 
-    
+
     def update(self, stamped_error, status):
-        
+
         if status == False:
             self.__update(stamped_error)
             return 0.0
         else:
             return self.__update(stamped_error)
 
-        
+
     def __update(self, stamped_error):
-        
+
         latest_error=stamped_error[0]
         stamp=stamped_error[1]
-        
+
         stamp_seconds = Time.from_msg(stamp).nanoseconds / 1e9
         error_dot = 0.0
         if self.previous is not None:
