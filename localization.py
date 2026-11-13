@@ -60,6 +60,8 @@ class localization(Node):
         P = np.eye(6)
 
         self.kf = kalman_filter(P, Q, R, x, dt)
+        # Publish the estimate separately from raw odometry for live comparison.
+        self.ekf_publisher = self.create_publisher(odom, "/ekf/odom", 10)
         self.last_stamp_ns = None
         # TODONE Part 3: Use the odometry and IMU data for the EKF
         self.odom_sub = message_filters.Subscriber(
@@ -118,6 +120,25 @@ class localization(Node):
             xhat[2],
             odom_msg.header.stamp
         ]
+
+        # Keep the sensor timestamp and frames so both paths share coordinates.
+        estimate = odom()
+        estimate.header = odom_msg.header
+        estimate.child_frame_id = odom_msg.child_frame_id
+        estimate.pose.pose.position.x = float(xhat[0])
+        estimate.pose.pose.position.y = float(xhat[1])
+        estimate.pose.pose.orientation.z = float(np.sin(xhat[2] / 2))
+        estimate.pose.pose.orientation.w = float(np.cos(xhat[2] / 2))
+        estimate.twist.twist.linear.x = float(xhat[4])
+        estimate.twist.twist.angular.z = float(xhat[3])
+        # ROS pose covariance order is [x, y, z, roll, pitch, yaw].
+        for ros_i, state_i in ((0, 0), (1, 1), (5, 2)):
+            for ros_j, state_j in ((0, 0), (1, 1), (5, 2)):
+                estimate.pose.covariance[6 * ros_i + ros_j] = float(self.kf.P[state_i, state_j])
+        for ros_i, state_i in ((0, 4), (5, 3)):
+            for ros_j, state_j in ((0, 4), (5, 3)):
+                estimate.twist.covariance[6 * ros_i + ros_j] = float(self.kf.P[state_i, state_j])
+        self.ekf_publisher.publish(estimate)
 
         # TODONE Part 4: log your data
         stamp = (
