@@ -1,4 +1,6 @@
 import sys
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from utilities import Logger
 
@@ -25,11 +27,14 @@ odom_qos=QoSProfile(reliability=2, durability=2, history=1, depth=10)
 
 class localization(Node):
 
-    def __init__(self, type, dt, loggerName="robotPose.csv", loggerHeaders=["imu_ax", "imu_ay", "kf_ax", "kf_ay","kf_vx","kf_w","kf_x", "kf_y","stamp"]):
+    def __init__(self, type, dt, loggerName=None, loggerHeaders=[
+    "imu_ax", "imu_ay", "kf_ax", "kf_ay",
+    "kf_vx", "kf_w", "kf_x", "kf_y",
+    "odom_x", "odom_y", "odom_vx", "odom_w", "stamp",
+], motion="unknown"):
 
         super().__init__("localizer")
 
-        self.loc_logger=Logger( loggerName , loggerHeaders)
         self.pose=None
 
         if type==rawSensors:
@@ -39,6 +44,18 @@ class localization(Node):
         else:
             print("We don't have this type for localization", sys.stderr)
             return
+
+        if loggerName is None:
+            timestamp = datetime.now(ZoneInfo("America/Toronto")).strftime("%Y%m%d_%H%M%S_%f")
+            if type == kalmanFilter:
+                # Read the actual configured covariance scales, not duplicated constants.
+                q_value = f"{self.kf.Q[0, 0]:g}".replace(".", "_")
+                r_value = f"{self.kf.R[0, 0]:g}".replace(".", "_")
+                loggerName = f"Q{q_value}R{r_value}_{motion}_{timestamp}.csv"
+            else:
+                loggerName = f"raw_{motion}_{timestamp}.csv"
+        self.loc_logger = Logger(loggerName, loggerHeaders)
+        self.get_logger().info(f"Logging to {loggerName}")
 
     def initRawSensors(self):
         self.create_subscription(odom, "/odom", self.odom_callback, qos_profile=odom_qos)
@@ -51,7 +68,7 @@ class localization(Node):
         x = np.zeros(6)
 
         # Process noise: uncertainty added during each prediction.
-        Q = 0.5 * np.eye(6)
+        Q = 1 * np.eye(6)
 
         # Measurement noise for [v, w, ax, ay].
         R = 0.5 * np.eye(4)
@@ -147,14 +164,18 @@ class localization(Node):
         )
 
         log_values = [
-            z[2],                 # imu_ax
-            z[3],                 # imu_ay
-            xhat[5],              # kf_ax = estimated forward acceleration
-            xhat[4] * xhat[3],     # kf_ay = estimated v*w
-            xhat[4],              # kf_vx
-            xhat[3],              # kf_w
-            xhat[0],              # kf_x
-            xhat[1],              # kf_y
+            z[2],                              # imu_ax
+            z[3],                              # imu_ay
+            xhat[5],                           # kf_ax
+            xhat[4] * xhat[3],                  # kf_ay
+            xhat[4],                           # kf_vx
+            xhat[3],                           # kf_w
+            xhat[0],                           # kf_x
+            xhat[1],                           # kf_y
+            odom_msg.pose.pose.position.x,      # odom_x
+            odom_msg.pose.pose.position.y,      # odom_y
+            odom_msg.twist.twist.linear.x,       # odom_vx
+            odom_msg.twist.twist.angular.z,      # odom_w
             stamp,
         ]
         self.loc_logger.log_values(log_values)

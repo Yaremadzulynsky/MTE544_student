@@ -1,0 +1,478 @@
+{
+  "configById": {
+    "Plot!sensor0": {
+      "title": "Forward velocity (m/s)",
+      "paths": [
+        {
+          "value": "/ekf/measurements.data[0]",
+          "label": "Measured",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/predicted_measurements.data[0]",
+          "label": "Predicted h(x\u2212)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        },
+        {
+          "value": "/ekf/estimated_measurements.data[0]",
+          "label": "Corrected h(x+)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!sensor1": {
+      "title": "Angular velocity (rad/s)",
+      "paths": [
+        {
+          "value": "/ekf/measurements.data[1]",
+          "label": "Measured",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/predicted_measurements.data[1]",
+          "label": "Predicted h(x\u2212)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        },
+        {
+          "value": "/ekf/estimated_measurements.data[1]",
+          "label": "Corrected h(x+)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!sensor2": {
+      "title": "Forward acceleration (m/s\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/measurements.data[2]",
+          "label": "Measured",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/predicted_measurements.data[2]",
+          "label": "Predicted h(x\u2212)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        },
+        {
+          "value": "/ekf/estimated_measurements.data[2]",
+          "label": "Corrected h(x+)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!sensor3": {
+      "title": "Lateral acceleration (m/s\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/measurements.data[3]",
+          "label": "Measured",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/predicted_measurements.data[3]",
+          "label": "Predicted h(x\u2212)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        },
+        {
+          "value": "/ekf/estimated_measurements.data[3]",
+          "label": "Corrected h(x+)",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!variance0": {
+      "title": "x position variance (m\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/prior_variance.data[0]",
+          "label": "Before update",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/posterior_variance.data[0]",
+          "label": "After update",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!variance1": {
+      "title": "y position variance (m\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/prior_variance.data[1]",
+          "label": "Before update",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/posterior_variance.data[1]",
+          "label": "After update",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!variance2": {
+      "title": "Heading variance (rad\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/prior_variance.data[2]",
+          "label": "Before update",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        },
+        {
+          "value": "/ekf/posterior_variance.data[2]",
+          "label": "After update",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#40c9ff"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!innovation0": {
+      "title": "v innovation (m/s)",
+      "paths": [
+        {
+          "value": "/ekf/innovation.data[0]",
+          "label": "Measured \u2212 predicted",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!innovation1": {
+      "title": "\u03c9 innovation (rad/s)",
+      "paths": [
+        {
+          "value": "/ekf/innovation.data[1]",
+          "label": "Measured \u2212 predicted",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!innovation2": {
+      "title": "ax innovation (m/s\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/innovation.data[2]",
+          "label": "Measured \u2212 predicted",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!innovation3": {
+      "title": "ay innovation (m/s\u00b2)",
+      "paths": [
+        {
+          "value": "/ekf/innovation.data[3]",
+          "label": "Measured \u2212 predicted",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#f5a623"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!correction0": {
+      "title": "x correction (m)",
+      "paths": [
+        {
+          "value": "/ekf/correction.data[0]",
+          "label": "K \u00d7 innovation",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!correction1": {
+      "title": "y correction (m)",
+      "paths": [
+        {
+          "value": "/ekf/correction.data[1]",
+          "label": "K \u00d7 innovation",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "Plot!correction2": {
+      "title": "Heading correction (rad)",
+      "paths": [
+        {
+          "value": "/ekf/correction.data[2]",
+          "label": "K \u00d7 innovation",
+          "enabled": true,
+          "timestampMethod": "receiveTime",
+          "color": "#56d68b"
+        }
+      ],
+      "xAxisVal": "timestamp",
+      "showLegend": true,
+      "legendDisplay": "top",
+      "showPlotValuesInLegend": true,
+      "showXAxisLabels": true,
+      "showYAxisLabels": true,
+      "isSynced": true,
+      "followingViewWidth": 30
+    },
+    "3D!paths": {
+      "title": "Odometry (orange) / EKF (green)",
+      "followTf": "odom",
+      "followMode": "follow-pose",
+      "cameraState": {
+        "perspective": false,
+        "distance": 12,
+        "phi": 0,
+        "thetaOffset": 0,
+        "targetOffset": [
+          0,
+          0,
+          0
+        ],
+        "target": [
+          0,
+          0,
+          0
+        ],
+        "targetOrientation": [
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      "topics": {
+        "/ekf/path": {
+          "visible": true,
+          "color": "#56d68b",
+          "lineWidth": 3
+        },
+        "/ekf/odom_path": {
+          "visible": true,
+          "color": "#f5a623",
+          "lineWidth": 2
+        },
+        "/ekf/odom": {
+          "visible": true
+        }
+      },
+      "layers": {},
+      "transforms": {}
+    },
+    "Tab!views": {
+      "activeTabIdx": 0,
+      "tabs": [
+        {
+          "title": "Motion + sensor fusion",
+          "layout": {
+            "direction": "row",
+            "first": "3D!paths",
+            "second": {
+              "direction": "row",
+              "first": {
+                "direction": "column",
+                "first": "Plot!sensor0",
+                "second": "Plot!sensor1"
+              },
+              "second": {
+                "direction": "column",
+                "first": "Plot!sensor2",
+                "second": "Plot!sensor3"
+              }
+            }
+          }
+        },
+        {
+          "title": "Why the estimate changes",
+          "layout": {
+            "direction": "row",
+            "first": {
+              "direction": "row",
+              "first": {
+                "direction": "column",
+                "first": "Plot!innovation0",
+                "second": "Plot!innovation1"
+              },
+              "second": {
+                "direction": "column",
+                "first": "Plot!innovation2",
+                "second": "Plot!innovation3"
+              }
+            },
+            "second": {
+              "direction": "row",
+              "first": {
+                "direction": "column",
+                "first": "Plot!correction0",
+                "second": "Plot!correction1"
+              },
+              "second": "Plot!correction2"
+            }
+          }
+        },
+        {
+          "title": "Uncertainty",
+          "layout": {
+            "direction": "row",
+            "first": {
+              "direction": "column",
+              "first": "Plot!variance0",
+              "second": "Plot!variance1"
+            },
+            "second": "Plot!variance2"
+          }
+        }
+      ]
+    }
+  },
+  "globalVariables": {},
+  "userNodes": {},
+  "linkedGlobalVariables": [],
+  "playbackConfig": {
+    "speed": 1,
+    "messageOrder": "receiveTime"
+  },
+  "layout": "Tab!views"
+}

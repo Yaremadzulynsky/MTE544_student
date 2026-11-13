@@ -1,11 +1,15 @@
 import sys
+import os
+import subprocess
+from pathlib import Path
 
 from utilities import euler_from_quaternion, calculate_angular_error, calculate_linear_error
 from pid import PID_ctrl
 
 from rclpy import init, spin, spin_once, ok, shutdown
 from rclpy.node import Node
-from rclpy.executors import SingleThreadedExecutor
+from rclpy.executors import SingleThreadedExecutor, ExternalShutdownException
+from rclpy.signals import SignalHandlerOptions
 from geometry_msgs.msg import Twist
 
 
@@ -34,7 +38,12 @@ class decision_maker(Node):
 
 
         # TODONE Part 3: use the Kalman Filter
-        self.localizer = localization(kalmanFilter, publishing_period)
+        motion_name = {
+            POINT_PLANNER: "point",
+            SPIRAL_4TUNE: "spiral",
+            TRAJECTORY_PLANNER: "trajectory",
+        }.get(motion_type, "unknown")
+        self.localizer = localization(kalmanFilter, publishing_period, motion=motion_name)
 
         if motion_type==POINT_PLANNER:
             # Point-controller gains restored from Lab 2 (origin/L2/Grant).
@@ -111,7 +120,7 @@ import argparse
 def main(args=None):
 
 
-    init()
+    init(signal_handler_options=SignalHandlerOptions.NO)
 
 
     if args.motion == "point":
@@ -133,15 +142,31 @@ def main(args=None):
         executor.spin()
     except SystemExit:
         print(f"reached there successfully {DM.localizer.pose}")
-    except KeyboardInterrupt:
+    except (KeyboardInterrupt, ExternalShutdownException):
         pass
     finally:
-        DM.publisher.publish(Twist())
-        executor.shutdown()
-        DM.localizer.destroy_node()
-        DM.destroy_node()
-        if ok():
-            shutdown()
+        csv_filename = DM.localizer.loc_logger.filename
+        try:
+            # Ctrl+C is handled above while the ROS context is still active.
+            try:
+                if ok():
+                    DM.publisher.publish(Twist())
+            finally:
+                executor.shutdown()
+                DM.localizer.destroy_node()
+                DM.destroy_node()
+                if ok():
+                    shutdown()
+        finally:
+            # Render only after control has stopped; no GUI/display is required.
+            try:
+                subprocess.run(
+                    [sys.executable, str(Path(__file__).with_name("plot_errors.py")),
+                     "--files", csv_filename, "--no-show"],
+                    env={**os.environ, "MPLBACKEND": "Agg"}, check=True,
+                )
+            except (OSError, subprocess.CalledProcessError) as error:
+                print(f"Could not save plot for {csv_filename}: {error}", file=sys.stderr)
 
 
 
