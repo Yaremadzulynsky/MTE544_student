@@ -2,9 +2,18 @@ import matplotlib.pyplot as plt
 import csv
 from pathlib import Path
 import argparse
+import re
 
 
 def plot_errors(filename, show=True):
+    case_name = Path(filename).stem
+    # Filenames encode decimal points as underscores, e.g. Q0_5R2_5_point.
+    tuning = re.search(r"Q(\d+(?:[_.]\d+)?)R(\d+(?:[_.]\d+)?)", case_name)
+    if tuning:
+        q_value, r_value = (float(value.replace("_", ".")) for value in tuning.groups())
+        title = f"{case_name} — Q = {q_value:g}, R = {r_value:g}"
+    else:
+        title = f"{case_name} — Q and R unspecified"
     with open(filename, newline="") as stream:
         reader = csv.reader(stream, skipinitialspace=True)
         headers = [name.strip() for name in next(reader, []) if name.strip()]
@@ -43,11 +52,40 @@ def plot_errors(filename, show=True):
     axes[1].grid()
 
     Path("images").mkdir(exist_ok=True)
+    fig.suptitle(title)
+    fig.tight_layout()
     fig.savefig(f"images/{Path(filename).stem}.png", bbox_inches="tight")
     print(f"Saved images/{Path(filename).stem}.png")
+
+    # Keep the simplified figure and also provide the original all-state view.
+    full_fig, full_axes = plt.subplots(2, 1, figsize=(14, 8))
+    for line in axes[0].get_lines():
+        full_axes[0].plot(line.get_xdata(), line.get_ydata(),
+                          label=line.get_label(), linestyle=line.get_linestyle())
+    full_axes[0].set_title("Estimated path")
+    full_axes[0].set_xlabel("x (m)")
+    full_axes[0].set_ylabel("y (m)")
+    full_axes[0].legend()
+    full_axes[0].grid()
+
+    for name in headers:
+        if name != "stamp":
+            full_axes[1].plot(time_list, [row[indices[name]] for row in values],
+                              label=name)
+    full_axes[1].set_title("All logged measurements and states")
+    full_axes[1].set_xlabel("Time (s)")
+    full_axes[1].set_ylabel("Value (mixed units: m, m/s, m/s², rad, rad/s)")
+    full_axes[1].legend(ncol=4)
+    full_axes[1].grid()
+    full_fig.suptitle(title)
+    full_fig.tight_layout()
+    full_path = Path("images") / f"{Path(filename).stem}_all_states.png"
+    full_fig.savefig(full_path, bbox_inches="tight")
+    print(f"Saved {full_path}")
     if show:
         plt.show()
     plt.close(fig)
+    plt.close(full_fig)
 
 
 if __name__ == "__main__":
