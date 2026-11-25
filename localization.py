@@ -71,10 +71,9 @@ class localization(Node):
                         0,
                         0])        
             
-            # TODO PART 5 Put the Q and R matrices
-            # that you conclude from lab Three
-            Q=1.0
-            R=0.5
+            # Independent process and measurement noise, using Lab Three tuning.
+            Q=1.0 * np.eye(6)
+            R=0.5 * np.eye(4)
             P=np.eye(6)
                         
             self.kf=kalman_filter(P,Q,R, x)
@@ -120,7 +119,7 @@ if __name__=="__main__":
     
     init()
     
-    LOCALIZER=localization()
+    LOCALIZER=localization(kalmanFilter)
     
     
     spin(LOCALIZER)
