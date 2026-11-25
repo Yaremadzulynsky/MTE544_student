@@ -1,11 +1,9 @@
 # LAB 4 - Path planning and navigation
 
-## Reproducible simulation demo
-
-The saved simulation map, matching Gazebo world, launcher, and real-ROS tests are
-now included. See [the demo setup and commands](sim/lab4/README.md). The root
-`room.pgm` / `room.yaml` are for that simulation only; acquire a new map for the
-physical lab.
+The included `room.pgm` / `room.yaml` map matches `sim/lab4/arena.world`
+only. Use `sim/lab4/demo.rviz` for this simulation, and acquire a new map for
+the physical lab. The additional Python dependency is listed in
+`sim/lab4/requirements.txt`.
 
 ## Introduction
 
