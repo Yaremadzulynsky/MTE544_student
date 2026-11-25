@@ -62,17 +62,13 @@ def search(maze, start, end):
         :return:
     """
 
-    # TODO PART 4 Create start and end node with initized values for g, h and f
-    # Use None as parent if not defined
-    start_node = Node(...)
-    start_node.g = ...     # cost from start Node
-    start_node.h = ...     # heuristic estimated cost to end Node
-    start_node.f = ...
+    start_node = Node(position=start)
+    start_node.h = sqrt((start[0] - end[0]) ** 2 + (start[1] - end[1]) ** 2)
+    start_node.f = start_node.g + start_node.h
 
-    end_node = Node(...)
-    end_node.g = ...       # set a large value if not defined
-    end_node.h = ...       # heuristic estimated cost to end Node
-    end_node.f = ...
+    end_node = Node(position=end)
+    end_node.g = float("inf")
+    end_node.f = end_node.g + end_node.h
 
     # Initialize both yet_to_visit and visited dictionary
     # in this dict we will put all node that are yet_to_visit for exploration.
@@ -90,16 +86,17 @@ def search(maze, start, end):
     outer_iterations = 0
     max_iterations = (len(maze) // 2) ** 10
 
-    # TODO PART 4 what squares do we search . serarch movement is left-right-top-bottom
-    # (4 or 8 movements) from every positon
-    move = [[...],  # go up
-            [...],  # go left
-            [...],  # go down
-            [...],  # go right
-            [...],  # go up left
-            [...],  # go down left
-            [...],  # go up right
-            [...]]  # go down right
+    # Cell offsets are (dx, dy), with y increasing down the map image.
+    move = [
+        [0, -1],   # up
+        [-1, 0],   # left
+        [0, 1],    # down
+        [1, 0],    # right
+        [-1, -1],  # up left
+        [-1, 1],   # down left
+        [1, -1],   # up right
+        [1, 1],    # down right
+    ]
 
     """
         1) We first get the current node by comparing all f cost and selecting the lowest cost node for further expansion
@@ -118,8 +115,9 @@ def search(maze, start, end):
                 c) if child in yet_to_visit dict then ignore it
                 d) else move the child to yet_to_visit dict
     """
-    # TODO PART 4 find maze has got how many rows and columns
-    no_rows, no_columns = ...
+
+    # Get the dimensions of the maze
+    no_rows, no_columns = maze.shape
 
     # Loop until you find the end
 
@@ -156,15 +154,17 @@ def search(maze, start, end):
 
         for new_position in move:
 
-            # TODO PART 4 Get node position
-            node_position = (...)
+            node_position = (
+                current_node.position[0] + new_position[0],
+                current_node.position[1] + new_position[1],
+            )
 
-            # TODO PART 4 Make sure within range (check if within maze boundary)
-            if (...):
+            row, column = node_position
+            if not (0 <= row < no_rows and 0 <= column < no_columns):
                 continue
 
             # Make sure walkable terrain
-            if maze[node_position[0], node_position[1]] > 0.8:
+            if maze[row, column] > 0.8:
                 continue
 
             # Create new node
@@ -177,14 +177,17 @@ def search(maze, start, end):
 
         for child in children:
 
-            # TODO PART 4 Child is on the visited dict (use get method to check if child is in visited dict, if not found then default value is False)
-            if ():
+            if visited_dict.get(child.position, False):
                 continue
 
-            # TODO PART 4 Create the f, g, and h values
-            child.g = ...
-            # Heuristic costs calculated here, this is using eucledian distance
-            child.h = ...
+            dx = child.position[0] - current_node.position[0]
+            dy = child.position[1] - current_node.position[1]
+            step_cost = sqrt(dx**2 + dy**2)
+            child.g = current_node.g + step_cost
+            
+            goal_dx = end_node.position[0] - child.position[0]
+            goal_dy = end_node.position[1] - child.position[1]
+            child.h = sqrt(goal_dx**2 + goal_dy**2)
 
             child.f = child.g + child.h
 
