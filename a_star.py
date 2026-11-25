@@ -47,7 +47,14 @@ def return_path(current_node, maze):
     return path
 
 
-def search(maze, start, end):
+def search(maze, start, end, heuristic="euclidean"):
+
+    if heuristic == "manhattan":
+        distance = lambda dx, dy: abs(dx) + abs(dy)
+    elif heuristic == "euclidean":
+        distance = lambda dx, dy: sqrt(dx**2 + dy**2)
+    else:
+        raise ValueError("heuristic must be 'euclidean' or 'manhattan'")
 
     print("searching ....")
 
@@ -63,7 +70,7 @@ def search(maze, start, end):
     """
 
     start_node = Node(position=start)
-    start_node.h = sqrt((start[0] - end[0]) ** 2 + (start[1] - end[1]) ** 2)
+    start_node.h = distance(start[0] - end[0], start[1] - end[1])
     start_node.f = start_node.g + start_node.h
 
     end_node = Node(position=end)
@@ -187,7 +194,7 @@ def search(maze, start, end):
             
             goal_dx = end_node.position[0] - child.position[0]
             goal_dy = end_node.position[1] - child.position[1]
-            child.h = sqrt(goal_dx**2 + goal_dy**2)
+            child.h = distance(goal_dx, goal_dy)
 
             child.f = child.g + child.h
 
