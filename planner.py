@@ -31,9 +31,13 @@ class planner:
         # TODO PART 5 Create the cost-map, the laser_sig is 
         # the standard deviation for the gausiian for which
         # the mean is located on the occupant grid. 
-        self.m_utilites=mapManipulator(laser_sig=...)
-            
-        self.costMap=self.m_utilites.make_likelihood_field()
+
+        #NOTE: laster_sig should be tuned based on the buffer we need from obstacles. starting value of 0.33 is allowing for the 34cm diameter robot (0.17m radius) + 5cm of clearance from obstacles. tune based on the positiion and tracking error of the robot.
+        self.m_utilites = mapManipulator(
+            filename_=self.mapName,
+            laser_sig=0.33,
+        )
+        self.costMap = self.m_utilites.make_likelihood_field()
         
 
     def trajectory_planner(self, startPoseCart, endPoseCart):
@@ -48,16 +52,13 @@ class planner:
         endPose=self.m_utilites.position_2_cell(endPoseCart)
         
         # TODO PART 5 convert the cell pixels into the cartesian coordinates
-        
-        Path = list(map(...))
-
-
+        path_cells = search(self.costMap, startPose, endPose)
+        if not path_cells or path_cells[-1] != endPose:
+            raise ValueError("A* could not find a complete path to the goal")
+        path = [list(self.m_utilites.cell_2_position(cell)) for cell in path_cells]
 
         # TODO PART 5 return the path as list of [x,y]
-        return ...
-
-
-
+        return path
 
 if __name__=="__main__":
 
