@@ -1,5 +1,12 @@
 # LAB 4 - Path planning and navigation
 
+## Reproducible simulation demo
+
+The saved simulation map, matching Gazebo world, launcher, and real-ROS tests are
+now included. See [the demo setup and commands](sim/lab4/README.md). The root
+`room.pgm` / `room.yaml` are for that simulation only; acquire a new map for the
+physical lab.
+
 ## Introduction
 
 Welcome to LAB 4 of the mobile robotics course! 
