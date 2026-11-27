@@ -51,6 +51,14 @@ class planner:
         startPose=self.m_utilites.position_2_cell(startPoseCart)
         endPose=self.m_utilites.position_2_cell(endPoseCart)
         
+        # Reject invalid endpoints before searching the entire map.
+        height, width = self.costMap.shape
+        for label, cell in [("Start", startPose), ("Goal", endPose)]:
+            if not (0 <= cell[0] < width and 0 <= cell[1] < height):
+                raise ValueError(f"{label} is outside the map")
+        if self.costMap[endPose[1], endPose[0]] > 0.8:
+            raise ValueError("Goal is inside an obstacle or its clearance buffer")
+
         # TODO PART 5 convert the cell pixels into the cartesian coordinates
         path_cells = search(self.costMap, startPose, endPose)
         if not path_cells or path_cells[-1] != endPose:

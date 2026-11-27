@@ -83,8 +83,15 @@ class decision_maker(Node):
             print("waiting for odom msgs ....")
             return
         
-        self.goal=self.planner.plan([self.localizer.getPose()[0], self.localizer.getPose()[1]],
-                                     [msg.pose.position.x, msg.pose.position.y])
+        try:
+            self.goal=self.planner.plan([self.localizer.getPose()[0], self.localizer.getPose()[1]],
+                                       [msg.pose.position.x, msg.pose.position.y])
+        except ValueError as error:
+            # A goal in an obstacle or outside the map must not crash navigation
+            # or leave the previous velocity command active.
+            self.goal = None
+            self.publisher.publish(Twist())
+            self.get_logger().warning(f"Cannot plan to this goal: {error}. Choose a mapped free point.")
 
     
     def timerCallback(self):
