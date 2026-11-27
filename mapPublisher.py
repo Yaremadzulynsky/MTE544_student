@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     rclpy.init()
 
-    map_ = mapManipulator()
+    map_ = mapManipulator("room2.yaml")
 
     node = Node("mapPublisher")
 

@@ -5,7 +5,7 @@ from a_star import *
 POINT_PLANNER=0; TRAJECTORY_PLANNER=1
 
 class planner:
-    def __init__(self, type_, mapName="room"):
+    def __init__(self, type_, mapName="room2"):
 
         self.type=type_
         self.mapName=mapName
@@ -35,7 +35,7 @@ class planner:
         #NOTE: laster_sig should be tuned based on the buffer we need from obstacles. starting value of 0.33 is allowing for the 34cm diameter robot (0.17m radius) + 5cm of clearance from obstacles. tune based on the positiion and tracking error of the robot.
         self.m_utilites = mapManipulator(
             filename_=self.mapName,
-            laser_sig=0.33,
+            laser_sig=0.5,
         )
         self.costMap = self.m_utilites.make_likelihood_field()
         
